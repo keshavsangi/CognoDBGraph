@@ -1,0 +1,116 @@
+﻿
+    @model CognoDBGraph.Models.DeveloperExplorerViewModel
+@{
+    ViewData["Title"] = "CognoDB Graph Explorer";
+}
+
+<div class="container my-5">
+    <div class="p-4 mb-4 bg-light rounded-3 shadow-sm border">
+        <h1 class="display-6 text-primary fw-bold">CognoDB Developer Graph Explorer</h1>
+        <p class="lead text-secondary">
+            Explore direct skills (1-hop) and shared teammate recommendations (2-hop traversal) powered by CognoDB Cloud.
+        </p>
+
+        <form asp-action="Seed" method="post" class="mt-3">
+            <button type="submit" class="btn btn-warning fw-bold px-4 py-2 shadow-sm">
+                 Seed Sample Graph Data
+            </button>
+        </form>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Message))
+        {
+            <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                <strong>Success!</strong> @Model.Message
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+    </div>
+
+   
+    <div class="row g-4">
+       
+        <div class="col-lg-4 col-md-5">
+          
+            <div class="card shadow-sm mb-4 border-0">
+                <div class="card-header bg-dark text-white fw-bold">
+                    1. Select Developer
+                </div>
+                <div class="card-body">
+                    <form asp-action="Index" method="get">
+                        <label for="devId" class="form-label text-muted small">Choose a developer to inspect:</label>
+                        <select name="devId" id="devId" class="form-select form-select-lg" onchange="this.form.submit()">
+                            <option value="dev1" selected="@(Model.SelectedDevId == "dev1")">MS Dhoni (.NET)</option>
+                            <option value="dev2" selected="@(Model.SelectedDevId == "dev2")">Virat Kohli (Full Stack)</option>
+                            <option value="dev3" selected="@(Model.SelectedDevId == "dev3")">Suresh Raina (Cloud)</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+
+           
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-info text-white fw-bold">
+                    Direct Skills (1-Hop Traversal)
+                </div>
+                <div class="card-body">
+                    @if (Model.Skills != null && Model.Skills.Any())
+                    {
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var skill in Model.Skills)
+                            {
+                                <span class="badge bg-primary fs-6 px-3 py-2">@skill</span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted fst-italic mb-0">No direct skills found. Try clicking the Seed button above.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="col-lg-8 col-md-7">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white fw-bold">
+                    Recommended Teammates (2-Hop Traversal via Shared Skills)
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Teammates != null && Model.Teammates.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-4">Developer Name</th>
+                                        <th>Role</th>
+                                        <th>Connected By Skill</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var team in Model.Teammates)
+                                    {
+                                        <tr>
+                                            <td class="ps-4 fw-semibold text-dark">@team.Name</td>
+                                            <td><span class="text-secondary">@team.Role</span></td>
+                                            <td>
+                                                <span class="badge bg-secondary px-2 py-1">@team.SharedSkill</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="p-4 text-center text-muted">
+                            <p class="mb-0">No 2-hop connected teammates found for this developer.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
